@@ -1,6 +1,8 @@
 name: Publish queued RSS
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '17 8 * * *'
 permissions:
   contents: write
   pages: write
@@ -42,3 +44,13 @@ jobs:
       - name: Deploy Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Record run outcome
+        if: always()
+        env:
+          OUTCOME: ${{ job.status }}
+        run: |
+          echo "## RSS publication: $OUTCOME" >> "$GITHUB_STEP_SUMMARY"
+          echo 'This run processes prepared queue items only. Pinterest ingestion and sales are separate checks.' >> "$GITHUB_STEP_SUMMARY"
+          if [ "$OUTCOME" != success ]; then
+            echo '::error::RSS publication failed. Inspect this run before adding or retrying queue items.'
+          fi
