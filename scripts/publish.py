@@ -54,7 +54,7 @@ def publish(root, now, dry_run=False):
         if not image_url[len(prefix):].startswith("pins/"):
             raise ValueError("Queued images must be in the deployed pins directory")
         image = (root / image_url[len(prefix):]).resolve()
-        if not image.is_relative_to(root.resolve()) or not image.is_file():
+        if not image.is_relative_to((root / "pins").resolve()) or not image.is_file():
             raise ValueError("Image missing or outside repository")
         if image.stat().st_size != int(enclosure.get("length", "0")):
             raise ValueError("Enclosure byte length differs from image")
